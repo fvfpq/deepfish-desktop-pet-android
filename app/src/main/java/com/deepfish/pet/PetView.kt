@@ -37,9 +37,7 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
     private val baseContainer: FrameLayout = FrameLayout(context)
     private val speech: TextView = TextView(context)
     private val effectLayer: FrameLayout = FrameLayout(context)
-    private val speechTail: View = View(context)
     private var speechParams: LayoutParams? = null
-    private var tailParams: LayoutParams? = null
     private val charTopInset = 76
 
     private var currentFrame = "neutral"
@@ -67,17 +65,6 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
         "ciallo", "smug", "pressure", "shock", "fly", "price", "rival", "goAway", "stranded"
     )
 
-    private val behaviorLabels = mapOf(
-        "walk" to "散步中", "wash" to "洗碗中", "work" to "认真加班", "coffee" to "咖啡时间",
-        "toy" to "摸鱼中", "sleep" to "睡觉中", "dream" to "做梦中", "hungry" to "肚子咕咕叫",
-        "sit" to "坐好了", "pat" to "摸摸头", "feed" to "投喂成功", "shy" to "害羞",
-        "trip" to "绊倒了", "cry" to "委屈巴巴", "think" to "深度思考", "smug" to "自信",
-        "angry" to "用户怒了", "ciallo" to "随机卖萌", "fly" to "起飞", "price" to "准备涨价",
-        "panic" to "慌乱", "rival" to "双枪模式", "shock" to "震惊", "pressure" to "压力测试",
-        "stranded" to "搁浅了", "stretch" to "欢迎回来", "startle" to "惊醒", "dizzy" to "转晕了",
-        "goAway" to "AGI 训练中"
-    )
-
     init {
         setBackgroundColor(Color.TRANSPARENT)
         character.scaleType = ImageView.ScaleType.FIT_CENTER
@@ -93,8 +80,8 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
         )
         addView(baseContainer)
 
-        speech.setTextColor(Color.rgb(51, 65, 92))
-        speech.setBackgroundResource(R.drawable.bubble_pet_bg)
+        speech.setTextColor(Color.BLACK)
+        speech.setBackgroundColor(Color.TRANSPARENT)
         speech.textSize = 14f
         speech.setPadding(dp(14), dp(10), dp(14), dp(10))
         speech.setLineSpacing(0f, 1.3f)
@@ -102,11 +89,6 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
         speech.setOnClickListener { dismissSpeech() }
         speechParams = LayoutParams(dp(250), LayoutParams.WRAP_CONTENT, Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL)
         addView(speech, speechParams)
-
-        speechTail.background = drawableOf(R.drawable.bubble_pet_tail)
-        speechTail.alpha = 0f
-        tailParams = LayoutParams(dp(22), dp(12), Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL)
-        addView(speechTail, tailParams)
 
         addView(
             effectLayer,
@@ -126,25 +108,17 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         val charHeight = h - dp(charTopInset)
-        val tailH = dp(12)
         speechParams?.let {
             it.bottomMargin = charHeight + dp(6)
             speech.layoutParams = it
-        }
-        tailParams?.let {
-            it.bottomMargin = charHeight - (tailH / 2) + dp(6)
-            speechTail.layoutParams = it
         }
     }
 
     private fun dp(v: Int): Int = (v * resources.displayMetrics.density).toInt()
 
-    private fun drawableOf(res: Int) = androidx.core.content.ContextCompat.getDrawable(context, res)
-
     private fun dismissSpeech() {
         removeCallbacks(speechTimer)
         speech.animate().alpha(0f).setDuration(180).start()
-        speechTail.animate().alpha(0f).setDuration(180).start()
     }
 
     private fun isSleepPhase(): Boolean = BodyClock.getPhase().id == "sleep"
@@ -236,13 +210,10 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
 
     // ---- Speech bubble ----
 
-    fun say(text: String, label: String? = null, duration: Long = 4200) {
-        val phase = BodyClock.getPhase()
-        speech.text = "${label ?: phase.label}\n${Behaviors.stripHints(text)}"
+    fun say(text: String, duration: Long = 4200) {
+        speech.text = Behaviors.stripHints(text)
         speech.alpha = 0f
-        speechTail.alpha = 0f
         speech.animate().alpha(1f).setDuration(180).start()
-        speechTail.animate().alpha(1f).setDuration(180).start()
         removeCallbacks(speechTimer)
         speechTimer = Runnable { dismissSpeech() }
         postDelayed(speechTimer, duration)
@@ -358,7 +329,7 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
     fun startWalk(duration: Long = 7200, announce: Boolean = true) {
         stopWalk(false)
         walkDirection = if (Random.nextBoolean()) 1 else -1
-        if (announce) say(Behaviors.formatLine("walk"), "散步中", 3400)
+        if (announce) say(Behaviors.formatLine("walk"), 3400)
         startFrameLoop(arrayOf("walk", "walk-b", "walk-b", "walk"), intArrayOf(165, 235, 305, 190))
         startWalkBob(duration)
 
@@ -393,7 +364,7 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
 
     // ---- Behavior runner (ported from app.js runBehavior) ----
 
-    data class SayOptions(val say: Boolean = true, val label: String? = null)
+    data class SayOptions(val say: Boolean = true)
 
     fun runBehavior(id: String, options: SayOptions = SayOptions()) {
         val behavior = Behaviors.get(id)
@@ -407,7 +378,7 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
         if (id == "dizzy") dizzyStars(behavior.duration)
         particles(behavior.icon, if (id in listOf("cry", "shock", "rival")) 6 else 3)
         if (options.say) {
-            say(Behaviors.formatLine(id), options.label ?: behaviorLabels[id], minOf(5200L, behavior.duration + 1800))
+            say(Behaviors.formatLine(id))
         }
     }
 
@@ -556,7 +527,7 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
                     return true
                 }
                 if (completed.total > 10) {
-                    runBehavior("startle", SayOptions(label = "拖拽反馈"))
+                    runBehavior("startle")
                     return true
                 }
                 val now = System.currentTimeMillis()
@@ -566,7 +537,7 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
                 } else {
                     lastClickAt = now
                     host?.onTap()
-                    say(clickLines.random(), "点击反馈", 2400)
+                    say(clickLines.random(), 2400)
                 }
                 return true
             }
@@ -584,7 +555,7 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
 
     fun onWakeEvent(action: String, awayMs: Long = 0) {
         runBehavior(action)
-        if (action == "startle" && awayMs > 3600000) say("诶？！你终于回来了！", "惊醒", 5000)
+        if (action == "startle" && awayMs > 3600000) say("诶？！你终于回来了！", 5000)
     }
 
     fun onCommand(command: String) {
