@@ -82,12 +82,12 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
 
         speech.setTextColor(Color.BLACK)
         speech.setBackgroundColor(Color.TRANSPARENT)
+        speech.gravity = Gravity.CENTER_HORIZONTAL
         speech.textSize = 14f
-        speech.setPadding(dp(14), dp(10), dp(14), dp(10))
         speech.setLineSpacing(0f, 1.3f)
         speech.alpha = 0f
         speech.setOnClickListener { dismissSpeech() }
-        speechParams = LayoutParams(dp(250), LayoutParams.WRAP_CONTENT, Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL)
+        speechParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL)
         addView(speech, speechParams)
 
         addView(
