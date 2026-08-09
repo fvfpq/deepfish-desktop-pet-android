@@ -20,7 +20,24 @@ class ChatManager(private val settings: PetSettings, private val apiKey: String)
         "遇到严肃问题时优先准确和有帮助，不要为了卖萌牺牲事实。"
     ).joinToString("\n")
 
-    suspend fun send(messages: List<ChatMessage>): String = withContext(Dispatchers.IO) {
+    suspend fun send(messages: List<ChatMessage>): String = sendInternal(messages, systemPrompt, 400)
+
+    /** 以自定义系统提示调用模型，用于非闲聊任务（如手机操作决策）。 */
+    suspend fun sendWithPrompt(
+        systemPrompt: String,
+        userMessage: String,
+        maxTokens: Int = 600,
+    ): String = sendInternal(
+        listOf(ChatMessage("user", userMessage)),
+        systemPrompt,
+        maxTokens,
+    )
+
+    private suspend fun sendInternal(
+        messages: List<ChatMessage>,
+        system: String,
+        maxTokens: Int,
+    ): String = withContext(Dispatchers.IO) {
         val endpoint = settings.endpoint.trim().trimEnd('/')
         if (!endpoint.startsWith("https://")) error("API 地址必须使用 HTTPS")
 
@@ -28,9 +45,9 @@ class ChatManager(private val settings: PetSettings, private val apiKey: String)
         val body = JSONObject()
         body.put("model", settings.model)
         body.put("temperature", 0.8)
-        body.put("max_tokens", 400)
+        body.put("max_tokens", maxTokens)
         body.put("messages", JSONArray().apply {
-            put(JSONObject().put("role", "system").put("content", systemPrompt))
+            put(JSONObject().put("role", "system").put("content", system))
             recent.forEach { m ->
                 put(JSONObject().put("role", m.role).put("content", m.content))
             }
