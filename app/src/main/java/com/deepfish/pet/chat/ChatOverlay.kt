@@ -54,25 +54,28 @@ class ChatOverlay(private val context: Context) {
         view.findViewById<TextView>(R.id.chat_close).setOnClickListener { hide() }
         view.findViewById<Button>(R.id.chat_send).setOnClickListener { send() }
         setupDrag(view.findViewById(R.id.chat_drag_handle), view)
+        setupResize(view.findViewById(R.id.chat_resize_handle))
+        setupInputFocus(view)
 
         if (chatLog.childCount == 0) {
             appendMessage("assistant", "我在呢。想聊什么？")
         }
 
         val p = WindowManager.LayoutParams(
-            WindowManager.LayoutParams.WRAP_CONTENT,
-            WindowManager.LayoutParams.WRAP_CONTENT,
+            dp(320),
+            dp(440),
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
             else
                 @Suppress("DEPRECATION") WindowManager.LayoutParams.TYPE_PHONE,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
-                    WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
             PixelFormat.TRANSLUCENT
         ).apply {
             gravity = Gravity.TOP or Gravity.START
             x = dp(40)
             y = dp(120)
+            softInputMode = WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
         }
 
         wm.addView(view, p)
@@ -122,6 +125,58 @@ class ChatOverlay(private val context: Context) {
                 }
                 else -> false
             }
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun setupResize(handle: View) {
+        var downX = 0f
+        var downY = 0f
+        var startW = 0
+        var startH = 0
+        handle.setOnTouchListener { _, event ->
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    downX = event.rawX
+                    downY = event.rawY
+                    startW = params?.width ?: 0
+                    startH = params?.height ?: 0
+                    true
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    val dx = event.rawX - downX
+                    val dy = event.rawY - downY
+                    val p = params
+                    val v = root
+                    if (p != null && v != null) {
+                        p.width = (startW + dx).toInt().coerceAtLeast(dp(220))
+                        p.height = (startH + dy).toInt().coerceAtLeast(dp(300))
+                        windowManager?.updateViewLayout(v, p)
+                    }
+                    true
+                }
+                else -> false
+            }
+        }
+    }
+
+    private fun setupInputFocus(view: View) {
+        input.setOnFocusChangeListener { _, hasFocus ->
+            val p = params ?: return@setOnFocusChangeListener
+            if (hasFocus) {
+                p.flags = p.flags and WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE.inv()
+            } else {
+                p.flags = p.flags or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+            }
+            windowManager?.updateViewLayout(view, p)
+        }
+        input.setOnClickListener {
+            val p = params ?: return@setOnClickListener
+            p.flags = p.flags and WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE.inv()
+            windowManager?.updateViewLayout(view, p)
+            input.requestFocus()
+            val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+            imm.showSoftInput(input, 0)
         }
     }
 
