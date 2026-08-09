@@ -22,6 +22,7 @@ class PetService : Service(), PetWindowHost {
         const val ACTION_START = "com.deepfish.pet.START"
         const val ACTION_STOP = "com.deepfish.pet.STOP"
         const val ACTION_SHOW_CHAT = "com.deepfish.pet.SHOW_CHAT"
+        const val ACTION_TOGGLE_TOUCH = "com.deepfish.pet.TOGGLE_TOUCH"
         const val CHANNEL_ID = "deepfish_pet"
         private const val NOTIFICATION_ID = 1
 
@@ -72,6 +73,7 @@ class PetService : Service(), PetWindowHost {
                 return START_NOT_STICKY
             }
             ACTION_SHOW_CHAT -> petView?.host?.openChat()
+            ACTION_TOGGLE_TOUCH -> toggleTouchThrough()
             else -> {
                 val settings = Prefs.settings(this)
                 scale = settings.scale
@@ -115,17 +117,56 @@ class PetService : Service(), PetWindowHost {
             Intent(this, PetService::class.java).setAction(ACTION_STOP),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
+        val touchIntent = PendingIntent.getService(
+            this, 2,
+            Intent(this, PetService::class.java).setAction(ACTION_TOGGLE_TOUCH),
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        val touchOn = Prefs.settings(this).touchThrough
         val builder = Notification.Builder(this, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_menu_compass)
             .setContentTitle("蓝色大肥鱼桌宠")
-            .setContentText("我在这里陪着你哦～")
+            .setContentText(if (touchOn) "已开启防误触（触摸穿透）" else "我在这里陪着你哦～")
             .setContentIntent(pending)
             .setOngoing(true)
+            .addAction(
+                android.R.drawable.ic_lock_lock,
+                if (touchOn) "关闭防误触" else "防误触",
+                touchIntent
+            )
             .addAction(android.R.drawable.ic_menu_close_clear_cancel, "隐藏桌宠", stopIntent)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             builder.setCategory(Notification.CATEGORY_SERVICE)
         }
         return builder.build()
+    }
+
+    private fun toggleTouchThrough() {
+        val current = Prefs.settings(this).touchThrough
+        Prefs.saveSettings(
+            this,
+            Prefs.settings(this).copy(touchThrough = !current)
+        )
+        petView?.let { view ->
+            setTouchThrough(!current, view)
+        }
+        val nm = getSystemService(NotificationManager::class.java)
+        nm?.notify(NOTIFICATION_ID, buildNotification())
+    }
+
+    fun applyTouchThrough(on: Boolean) {
+        val view = petView ?: return
+        setTouchThrough(on, view)
+    }
+
+    private fun setTouchThrough(on: Boolean, view: PetView) {
+        val params = layoutParams ?: return
+        if (on) {
+            params.flags = params.flags or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+        } else {
+            params.flags = params.flags and WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE.inv()
+        }
+        windowManager?.updateViewLayout(view, params)
     }
 
     private fun registerScreenReceiver() {
@@ -174,6 +215,9 @@ class PetService : Service(), PetWindowHost {
         view.interactiveZones = settings.interactiveZones
         view.spicyLines = settings.spicyLines
         view.behaviorIntensity = settings.behaviorIntensity
+        if (settings.touchThrough) {
+            params.flags = params.flags or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+        }
 
         try {
             wm.addView(view, params)

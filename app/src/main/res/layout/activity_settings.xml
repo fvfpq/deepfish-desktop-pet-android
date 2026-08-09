@@ -213,6 +213,15 @@
                 android:textColor="#394763"
                 android:textSize="13sp" />
 
+            <CheckBox
+                android:id="@+id/chk_touch_through"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="防误触：触摸穿透到下层应用，不拦截点击（可在通知栏快捷切换）"
+                android:textColor="#394763"
+                android:textSize="13sp" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

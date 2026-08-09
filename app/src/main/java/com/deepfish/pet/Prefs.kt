@@ -13,7 +13,8 @@ data class PetSettings(
     val freeWalk: Boolean = true,
     val interactiveZones: Boolean = true,
     val spicyLines: Boolean = true,
-    val behaviorIntensity: Float = 1f
+    val behaviorIntensity: Float = 1f,
+    val touchThrough: Boolean = false
 )
 
 object Prefs {
@@ -32,6 +33,7 @@ object Prefs {
     private const val KEY_INTERACTIVE_ZONES = "interactive_zones"
     private const val KEY_SPICY_LINES = "spicy_lines"
     private const val KEY_BEHAVIOR_INTENSITY = "behavior_intensity"
+    private const val KEY_TOUCH_THROUGH = "touch_through"
     private const val KEY_AUTO_START = "auto_start"
 
     private fun sp(context: Context): SharedPreferences =
@@ -48,7 +50,8 @@ object Prefs {
             freeWalk = getBoolean(KEY_FREE_WALK, true),
             interactiveZones = getBoolean(KEY_INTERACTIVE_ZONES, true),
             spicyLines = getBoolean(KEY_SPICY_LINES, true),
-            behaviorIntensity = getFloat(KEY_BEHAVIOR_INTENSITY, 1f)
+            behaviorIntensity = getFloat(KEY_BEHAVIOR_INTENSITY, 1f),
+            touchThrough = getBoolean(KEY_TOUCH_THROUGH, false)
         )
     }
 
@@ -64,6 +67,7 @@ object Prefs {
             .putBoolean(KEY_INTERACTIVE_ZONES, s.interactiveZones)
             .putBoolean(KEY_SPICY_LINES, s.spicyLines)
             .putFloat(KEY_BEHAVIOR_INTENSITY, s.behaviorIntensity)
+            .putBoolean(KEY_TOUCH_THROUGH, s.touchThrough)
             .apply()
     }
 

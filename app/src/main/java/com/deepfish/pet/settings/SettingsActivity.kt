@@ -29,6 +29,7 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var chkFreeWalk: CheckBox
     private lateinit var chkInteractiveZones: CheckBox
     private lateinit var chkSpicyLines: CheckBox
+    private lateinit var chkTouchThrough: CheckBox
 
     private lateinit var scaleBar: SeekBar
     private lateinit var scaleOutput: TextView
@@ -55,6 +56,7 @@ class SettingsActivity : AppCompatActivity() {
         chkFreeWalk = findViewById(R.id.chk_free_walk)
         chkInteractiveZones = findViewById(R.id.chk_interactive_zones)
         chkSpicyLines = findViewById(R.id.chk_spicy_lines)
+        chkTouchThrough = findViewById(R.id.chk_touch_through)
         scaleBar = findViewById(R.id.scale_bar)
         scaleOutput = findViewById(R.id.scale_output)
         intensityBar = findViewById(R.id.intensity_bar)
@@ -106,6 +108,7 @@ class SettingsActivity : AppCompatActivity() {
         chkFreeWalk.isChecked = s.freeWalk
         chkInteractiveZones.isChecked = s.interactiveZones
         chkSpicyLines.isChecked = s.spicyLines
+        chkTouchThrough.isChecked = s.touchThrough
         scaleBar.progress = ((s.scale - 0.6f) * 20).toInt().coerceIn(0, 11)
         intensityBar.progress = ((s.behaviorIntensity - 0.5f) * 10).toInt().coerceIn(0, 13)
         scaleOutput.text = "${(s.scale * 100).toInt()}%"
@@ -150,7 +153,8 @@ class SettingsActivity : AppCompatActivity() {
             interactiveZones = chkInteractiveZones.isChecked,
             spicyLines = chkSpicyLines.isChecked,
             scale = ((scaleBar.progress + 60) / 100f).coerceIn(0.6f, 1.15f),
-            behaviorIntensity = ((intensityBar.progress + 50) / 100f).coerceIn(0.5f, 1.8f)
+            behaviorIntensity = ((intensityBar.progress + 50) / 100f).coerceIn(0.5f, 1.8f),
+            touchThrough = chkTouchThrough.isChecked
         )
         Prefs.saveSettings(this, settings)
         val key = apiKey.text.toString().trim()
@@ -163,6 +167,7 @@ class SettingsActivity : AppCompatActivity() {
             view.interactiveZones = settings.interactiveZones
             view.spicyLines = settings.spicyLines
             view.behaviorIntensity = settings.behaviorIntensity
+            service.applyTouchThrough(settings.touchThrough)
         }
         keyStatus.text = "设置已保存"
     }
