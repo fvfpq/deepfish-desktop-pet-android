@@ -38,8 +38,11 @@ class ChatManager(private val settings: PetSettings, private val apiKey: String)
         system: String,
         maxTokens: Int,
     ): String = withContext(Dispatchers.IO) {
-        val endpoint = settings.endpoint.trim().trimEnd('/')
+        var endpoint = settings.endpoint.trim().trimEnd('/')
         if (!endpoint.startsWith("https://")) error("API 地址必须使用 HTTPS")
+        if (!endpoint.contains("/chat/completions")) {
+            endpoint = "$endpoint/chat/completions"
+        }
 
         val recent = messages.takeLast(10)
         val body = JSONObject()

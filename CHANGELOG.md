@@ -1,5 +1,12 @@
 # 更新记录
 
+## v1.2.1（2026-08-09）— 修复自定义模型 404
+
+- 自定义 API 地址只需填 base URL（如 `https://xxx/v1`），自动补全 `/chat/completions`
+- 也兼容直接填完整 `/chat/completions` 路径
+
+**下载**：`deepfish-pet-android-1.2.1.apk`
+
 ## v1.2.0（2026-08-09）— 接入 openclaw 无障碍能力，可指令操作手机
 
 - 内嵌 openclaw（MIT）无障碍执行层：读取屏幕节点快照、点击/滑动/输入/系统全局操作
