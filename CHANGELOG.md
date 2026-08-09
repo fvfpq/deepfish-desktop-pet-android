@@ -1,5 +1,17 @@
 # 更新记录
 
+## v1.1.0（2026-08-09）— 鲸鱼女仆形象 + 比例修正 + 闪退修复
+
+参考 [codex-deepseek-pet](https://github.com/YunYueSama/codex-deepseek-pet) 全面换用蓝发鲸鱼女仆立绘：
+
+- 角色形象由「蓝色大肥鱼」替换为「蓝发鲸鱼女仆」，12 个动作立绘映射全部行为
+- 图片保持原始比例显示（FIT_CENTER），消除旧版 FIT_XY 拉伸变形
+- 按动作切换视觉缩放（如思考 1.05、害羞 0.89、跳跃 0.84），各姿势主体大小协调
+- 修复快速绕圈触发旋转头晕时偶发闪退：位图解码空值防护、粒子/星星移除竞态加固、晃动动画循环独立计时器
+- 位图缓存改为按字节计算（上限 32MB），避免高清立绘内存超限
+
+**下载**：`deepfish-pet-android-1.1.0.apk`
+
 ## v1.0.2（2026-08-09）— 气泡样式优化
 
 参考 [Deepseek-DesktopPet](https://github.com/nonearth/Deepseek-DesktopPet) 改进气泡视觉与交互：

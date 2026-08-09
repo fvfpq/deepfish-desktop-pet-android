@@ -28,9 +28,13 @@ interface PetWindowHost {
 class PetView(context: Context, attrs: AttributeSet? = null) :
     FrameLayout(context, attrs) {
 
-    private val bitmapCache = LruCache<String, Bitmap>(32)
+    private val bitmapCache = object : LruCache<String, Bitmap>(32 * 1024 * 1024) {
+        override fun sizeOf(key: String, value: Bitmap): Int =
+            value.byteCount
+    }
 
     private val character: ImageView = ImageView(context)
+    private val baseContainer: FrameLayout = FrameLayout(context)
     private val speech: TextView = TextView(context)
     private val effectLayer: FrameLayout = FrameLayout(context)
     private val speechTail: View = View(context)
@@ -76,13 +80,18 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
 
     init {
         setBackgroundColor(Color.TRANSPARENT)
-        character.scaleType = ImageView.ScaleType.FIT_XY
+        character.scaleType = ImageView.ScaleType.FIT_CENTER
         character.contentDescription = "蓝色大肥鱼桌宠"
         val characterParams = LayoutParams(
             LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
         )
         characterParams.topMargin = dp(charTopInset)
-        addView(character, characterParams)
+        baseContainer.layoutParams = characterParams
+        baseContainer.addView(
+            character,
+            LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
+        )
+        addView(baseContainer)
 
         speech.setTextColor(Color.rgb(51, 65, 92))
         speech.setBackgroundResource(R.drawable.bubble_pet_bg)
@@ -148,19 +157,43 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
     private fun setFrame(name: String) {
         val resolved = Behaviors.frameName(name)
         currentFrame = resolved
-        val bmp = bitmapCache.get(resolved) ?: run {
-            context.assets.open("frames/frame-$resolved.png").use {
-                BitmapFactory.decodeStream(it)
-            }.also { bitmapCache.put(resolved, it) }
+        var bmp = bitmapCache.get(resolved)
+        if (bmp == null) {
+            try {
+                context.assets.open("frames/frame-$resolved.png").use {
+                    BitmapFactory.decodeStream(it)
+                }?.also { bmp = it; bitmapCache.put(resolved, it) }
+            } catch (_: Exception) {
+                bmp = null
+            }
         }
         character.setImageBitmap(bmp)
+        val poseScale = poseVisualScale(resolved)
+        baseContainer.scaleX = poseScale
+        baseContainer.scaleY = poseScale
+        baseContainer.pivotX = baseContainer.width / 2f
+        baseContainer.pivotY = baseContainer.height * 0.89f
+    }
+
+    private fun poseVisualScale(frame: String): Float = when (frame) {
+        "curious" -> 1.05f
+        "shy", "wave", "ciallo", "goAway" -> 0.89f
+        "happy", "excited", "price", "toy", "pat", "feed", "smug" -> 0.92f
+        "surprised", "shock", "panic", "trip", "stranded", "startle", "angry", "rival", "pressure" -> 0.91f
+        "sleepy", "sleep", "stretch" -> 0.91f
+        "jump", "fly" -> 0.84f
+        "walk", "walk-b" -> 0.92f
+        "work", "wash", "coffee", "hungry", "think" -> 0.91f
+        else -> 1f
     }
 
     private fun stopFramePlayback(reset: Boolean = true) {
         removeCallbacks(frameTimer)
         removeCallbacks(frameLoopTimer)
+        removeCallbacks(shakeTimer)
         frameTimer = null
         frameLoopTimer = null
+        shakeTimer = null
         if (reset) setFrame(restingFrame())
     }
 
@@ -251,31 +284,33 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
 
     private fun startSwayLoop(duration: Long, deg: Float, cycle: Long) {
         character.animate().cancel()
+        removeCallbacks(shakeTimer)
         var toggle = true
-        frameLoopTimer = object : Runnable {
+        shakeTimer = object : Runnable {
             override fun run() {
                 toggle = !toggle
                 character.animate().rotation(if (toggle) deg else -deg).setDuration(cycle).start()
-                if (frameLoopTimer === this) postDelayed(this, cycle)
+                if (shakeTimer === this) postDelayed(this, cycle)
             }
         }
-        frameLoopTimer!!.run()
-        frameTimer = Runnable { frameLoopTimer = null; character.animate().rotation(0f).setDuration(150).start() }
+        shakeTimer!!.run()
+        frameTimer = Runnable { shakeTimer = null; character.animate().rotation(0f).setDuration(150).start() }
         postDelayed(frameTimer, duration)
     }
 
     private fun startShakeLoop(duration: Long, cycle: Long, depth: Float) {
         character.animate().cancel()
+        removeCallbacks(shakeTimer)
         var toggle = true
-        frameLoopTimer = object : Runnable {
+        shakeTimer = object : Runnable {
             override fun run() {
                 toggle = !toggle
                 character.animate().translationX(if (toggle) depth else -depth).setDuration(cycle).start()
-                if (frameLoopTimer === this) postDelayed(this, cycle)
+                if (shakeTimer === this) postDelayed(this, cycle)
             }
         }
-        frameLoopTimer!!.run()
-        frameTimer = Runnable { frameLoopTimer = null; character.animate().translationX(0f).setDuration(150).start() }
+        shakeTimer!!.run()
+        frameTimer = Runnable { shakeTimer = null; character.animate().translationX(0f).setDuration(150).start() }
         postDelayed(frameTimer, duration)
     }
 
@@ -385,10 +420,14 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
                 .rotation(turn).alpha(1f).setStartDelay((i * 60).toLong())
                 .setDuration(900).withEndAction {
                     node.animate().alpha(0f).setDuration(100).withEndAction {
-                        effectLayer.removeView(node)
+                        removeIfAttached(node)
                     }.start()
                 }.start()
         }
+    }
+
+    private fun removeIfAttached(child: View) {
+        if (child.parent === effectLayer) effectLayer.removeView(child)
     }
 
     fun dizzyStars(duration: Long) {
@@ -409,7 +448,7 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
             star.animate().translationX(72f).setDuration(225).setStartDelay(delay + 225).start()
             star.animate().translationX(0f).setDuration(225).setStartDelay(delay + 450).start()
         }
-        container.postDelayed({ effectLayer.removeView(container) }, duration)
+        container.postDelayed({ removeIfAttached(container) }, duration)
     }
 
     // ---- Idle scheduling (ported from app.js) ----
@@ -539,6 +578,7 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
     // timers
     private var frameTimer: Runnable? = null
     private var frameLoopTimer: Runnable? = null
+    private var shakeTimer: Runnable? = null
     private var walkTimer: Runnable? = null
     private var walkStopTimer: Runnable? = null
     private var idleTimer: Runnable? = null
