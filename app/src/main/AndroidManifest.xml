@@ -30,12 +30,6 @@
             android:name=".settings.SettingsActivity"
             android:exported="false" />
 
-        <activity
-            android:name=".chat.ChatActivity"
-            android:exported="false"
-            android:theme="@style/Theme.DeepFish.Dialog"
-            android:windowSoftInputMode="adjustResize" />
-
         <service
             android:name=".PetService"
             android:exported="false"

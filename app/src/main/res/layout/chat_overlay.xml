@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@android:color/transparent">
+
+    <LinearLayout
+        android:layout_width="310dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/chat_overlay_panel"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="大肥鱼"
+                    android:textColor="#142350"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/provider_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="免费模型"
+                    android:textColor="#6A7899"
+                    android:textSize="10sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/chat_drag_handle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="6dp"
+                android:text="☰"
+                android:textColor="#526180"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/chat_close"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="#00000000"
+                android:gravity="center"
+                android:text="×"
+                android:textColor="#526180"
+                android:textSize="24sp" />
+        </LinearLayout>
+
+        <ScrollView
+            android:id="@+id/chat_scroll"
+            android:layout_width="match_parent"
+            android:layout_height="280dp"
+            android:layout_marginTop="6dp">
+
+            <LinearLayout
+                android:id="@+id/chat_log"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+        </ScrollView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/chat_input"
+                android:layout_width="0dp"
+                android:layout_height="38dp"
+                android:layout_weight="1"
+                android:background="@drawable/input_bg"
+                android:hint="问大肥鱼..."
+                android:imeOptions="actionSend"
+                android:inputType="text"
+                android:maxLines="1"
+                android:paddingHorizontal="10dp"
+                android:textColor="#142350"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/chat_send"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:layout_marginStart="7dp"
+                android:text="↑"
+                android:textSize="19sp" />
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

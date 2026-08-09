@@ -11,8 +11,8 @@ android {
         applicationId = "com.deepfish.pet"
         minSdk = 26
         targetSdk = 34
-        versionCode = 11
-        versionName = "1.2.3"
+        versionCode = 12
+        versionName = "1.2.4"
     }
 
     buildTypes {

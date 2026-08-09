@@ -14,7 +14,7 @@ import android.view.WindowManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.IntentFilter
-import com.deepfish.pet.chat.ChatActivity
+import com.deepfish.pet.chat.ChatOverlay
 
 class PetService : Service(), PetWindowHost {
 
@@ -40,6 +40,7 @@ class PetService : Service(), PetWindowHost {
     private var windowManager: WindowManager? = null
     private var layoutParams: WindowManager.LayoutParams? = null
     private var petView: PetView? = null
+    private var chatOverlay: ChatOverlay? = null
 
     private var scale = 1f
     private val density by lazy { resources.displayMetrics.density }
@@ -72,7 +73,7 @@ class PetService : Service(), PetWindowHost {
                 stopSelf()
                 return START_NOT_STICKY
             }
-            ACTION_SHOW_CHAT -> petView?.host?.openChat()
+            ACTION_SHOW_CHAT -> openChat()
             ACTION_TOGGLE_TOUCH -> toggleTouchThrough()
             else -> {
                 val settings = Prefs.settings(this)
@@ -85,6 +86,8 @@ class PetService : Service(), PetWindowHost {
 
     override fun onDestroy() {
         instance = null
+        chatOverlay?.hide()
+        chatOverlay = null
         unregisterReceiver(screenReceiver)
         petView?.let { windowManager?.removeView(it) }
         petView = null
@@ -187,7 +190,7 @@ class PetService : Service(), PetWindowHost {
         val wm = getSystemService(WINDOW_SERVICE) as WindowManager
         val settings = Prefs.settings(this)
 
-        val baseWidth = (150 * density).toInt()
+        val baseWidth = (120 * density).toInt()
         val charHeight = baseWidth * 832f / 768f
         val baseHeight = charHeight.toInt() + (76 * density).toInt()
         val width = (baseWidth * scale).toInt()
@@ -267,9 +270,8 @@ class PetService : Service(), PetWindowHost {
     }
 
     override fun openChat() {
-        val intent = Intent(this, ChatActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        startActivity(intent)
+        val overlay = chatOverlay ?: ChatOverlay(this).also { chatOverlay = it }
+        overlay.toggle()
     }
 
     override fun onTap() {
