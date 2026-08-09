@@ -146,7 +146,7 @@ class PetService : Service(), PetWindowHost {
         val wm = getSystemService(WINDOW_SERVICE) as WindowManager
         val settings = Prefs.settings(this)
 
-        val baseWidth = (215 * density).toInt()
+        val baseWidth = (150 * density).toInt()
         val charHeight = baseWidth * 832f / 768f
         val baseHeight = charHeight.toInt() + (76 * density).toInt()
         val width = (baseWidth * scale).toInt()
