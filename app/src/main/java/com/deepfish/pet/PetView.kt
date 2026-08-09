@@ -163,7 +163,7 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
                 context.assets.open("frames/frame-$resolved.png").use {
                     BitmapFactory.decodeStream(it)
                 }?.also { bmp = it; bitmapCache.put(resolved, it) }
-            } catch (_: Exception) {
+            } catch (_: Throwable) {
                 bmp = null
             }
         }
@@ -190,11 +190,17 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
     private fun stopFramePlayback(reset: Boolean = true) {
         removeCallbacks(frameTimer)
         removeCallbacks(frameLoopTimer)
-        removeCallbacks(shakeTimer)
         frameTimer = null
         frameLoopTimer = null
-        shakeTimer = null
         if (reset) setFrame(restingFrame())
+    }
+
+    private fun stopActionAnimation() {
+        removeCallbacks(shakeTimer)
+        removeCallbacks(shakeEndTimer)
+        shakeTimer = null
+        shakeEndTimer = null
+        character.animate().rotation(0f).translationX(0f).setDuration(120).start()
     }
 
     private fun playFrame(name: String, duration: Long) {
@@ -285,6 +291,7 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
     private fun startSwayLoop(duration: Long, deg: Float, cycle: Long) {
         character.animate().cancel()
         removeCallbacks(shakeTimer)
+        removeCallbacks(shakeEndTimer)
         var toggle = true
         shakeTimer = object : Runnable {
             override fun run() {
@@ -294,13 +301,14 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
             }
         }
         shakeTimer!!.run()
-        frameTimer = Runnable { shakeTimer = null; character.animate().rotation(0f).setDuration(150).start() }
-        postDelayed(frameTimer, duration)
+        shakeEndTimer = Runnable { shakeTimer = null; character.animate().rotation(0f).setDuration(150).start() }
+        postDelayed(shakeEndTimer, duration)
     }
 
     private fun startShakeLoop(duration: Long, cycle: Long, depth: Float) {
         character.animate().cancel()
         removeCallbacks(shakeTimer)
+        removeCallbacks(shakeEndTimer)
         var toggle = true
         shakeTimer = object : Runnable {
             override fun run() {
@@ -310,8 +318,8 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
             }
         }
         shakeTimer!!.run()
-        frameTimer = Runnable { shakeTimer = null; character.animate().translationX(0f).setDuration(150).start() }
-        postDelayed(frameTimer, duration)
+        shakeEndTimer = Runnable { shakeTimer = null; character.animate().translationX(0f).setDuration(150).start() }
+        postDelayed(shakeEndTimer, duration)
     }
 
     private fun startWalkBob(@Suppress("UNUSED_PARAMETER") duration: Long) {
@@ -378,6 +386,7 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
         walkTimer = null
         walkStopTimer = null
         stopFramePlayback()
+        stopActionAnimation()
         character.animate().translationY(0f).rotation(0f).scaleX(1f).scaleY(1f).setDuration(120).start()
         if (clearScene) setFrame(restingFrame())
     }
@@ -419,9 +428,13 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
             node.animate().translationY(-90f).translationX(node.translationX + driftX)
                 .rotation(turn).alpha(1f).setStartDelay((i * 60).toLong())
                 .setDuration(900).withEndAction {
-                    node.animate().alpha(0f).setDuration(100).withEndAction {
+                    try {
+                        node.animate().alpha(0f).setDuration(100).withEndAction {
+                            removeIfAttached(node)
+                        }.start()
+                    } catch (_: Exception) {
                         removeIfAttached(node)
-                    }.start()
+                    }
                 }.start()
         }
     }
@@ -431,24 +444,28 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
     }
 
     fun dizzyStars(duration: Long) {
-        val container = FrameLayout(context)
-        container.layoutParams = LayoutParams(dp(150), dp(42), Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL)
-        container.translationY = -dp(260).toFloat()
-        effectLayer.addView(container)
-        val stars = arrayOf("★", "✦", "★", "✦", "★")
-        for (i in stars.indices) {
-            val star = TextView(context)
-            star.text = stars[i]
-            star.textSize = 20f
-            star.setTextColor(Color.rgb(242, 187, 56))
-            val params = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER)
-            container.addView(star, params)
-            val delay = (i * -180L)
-            star.animate().translationX(-72f).setDuration(225).setStartDelay(delay).start()
-            star.animate().translationX(72f).setDuration(225).setStartDelay(delay + 225).start()
-            star.animate().translationX(0f).setDuration(225).setStartDelay(delay + 450).start()
+        try {
+            val container = FrameLayout(context)
+            container.layoutParams = LayoutParams(dp(150), dp(42), Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL)
+            container.translationY = -dp(260).toFloat()
+            effectLayer.addView(container)
+            val stars = arrayOf("★", "✦", "★", "✦", "★")
+            for (i in stars.indices) {
+                val star = TextView(context)
+                star.text = stars[i]
+                star.textSize = 20f
+                star.setTextColor(Color.rgb(242, 187, 56))
+                val params = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER)
+                container.addView(star, params)
+                val delay = (i * -180L).coerceAtLeast(0L)
+                star.animate().translationX(-72f).setDuration(225).setStartDelay(delay).start()
+                star.animate().translationX(72f).setDuration(225).setStartDelay(delay + 225).start()
+                star.animate().translationX(0f).setDuration(225).setStartDelay(delay + 450).start()
+            }
+            container.postDelayed({ removeIfAttached(container) }, duration)
+        } catch (_: Exception) {
+            // 动画叠加极端场景下静默兜底，避免闪退
         }
-        container.postDelayed({ removeIfAttached(container) }, duration)
     }
 
     // ---- Idle scheduling (ported from app.js) ----
@@ -579,6 +596,7 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
     private var frameTimer: Runnable? = null
     private var frameLoopTimer: Runnable? = null
     private var shakeTimer: Runnable? = null
+    private var shakeEndTimer: Runnable? = null
     private var walkTimer: Runnable? = null
     private var walkStopTimer: Runnable? = null
     private var idleTimer: Runnable? = null

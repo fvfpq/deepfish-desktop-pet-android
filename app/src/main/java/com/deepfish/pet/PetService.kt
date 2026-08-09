@@ -198,6 +198,7 @@ class PetService : Service(), PetWindowHost {
     override fun moveWindow(dx: Int, dy: Int) {
         val params = layoutParams ?: return
         val view = petView ?: return
+        if (!view.isAttachedToWindow) return
         val targetX = params.x + dx
         val targetY = params.y + dy
         val (nx, ny) = clampToScreen(targetX, targetY, params.width, params.height)
