@@ -23,6 +23,16 @@
 - 从 [Releases](https://github.com/fvfpq/deepfish-desktop-pet-android/releases) 下载 APK
 - 首次使用需授予「悬浮窗权限」与「通知权限」
 
+### 版本
+
+| 版本 | 说明 |
+|------|------|
+| [v1.0.2](https://github.com/fvfpq/deepfish-desktop-pet-android/releases/tag/v1.0.2) | 气泡样式优化（圆角描边 + 指向角色小尾巴，点击关闭） |
+| [v1.0.1](https://github.com/fvfpq/deepfish-desktop-pet-android/releases/tag/v1.0.1) | 缩小默认尺寸、解决文字与人物遮挡 |
+| [v1.0.0](https://github.com/fvfpq/deepfish-desktop-pet-android/releases/tag/v1.0.0) | 首发版 |
+
+各版本更新详情见 [CHANGELOG.md](CHANGELOG.md)。
+
 ## 交互方式
 
 | 操作 | 反馈 |
