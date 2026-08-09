@@ -74,18 +74,19 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
         setBackgroundColor(Color.TRANSPARENT)
         character.scaleType = ImageView.ScaleType.FIT_XY
         character.contentDescription = "蓝色大肥鱼桌宠"
-        addView(
-            character,
-            LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL)
+        val characterParams = LayoutParams(
+            LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
         )
+        characterParams.topMargin = dp(76)
+        addView(character, characterParams)
 
         speech.setTextColor(Color.rgb(20, 35, 80))
         speech.setBackgroundColor(Color.argb(245, 255, 255, 255))
         speech.textSize = 13f
         speech.setPadding(dp(12), dp(8), dp(12), dp(8))
         speech.alpha = 0f
-        val speechParams = LayoutParams(dp(272), LayoutParams.WRAP_CONTENT, Gravity.TOP or Gravity.CENTER_HORIZONTAL)
-        speechParams.topMargin = dp(12)
+        val speechParams = LayoutParams(dp(260), LayoutParams.WRAP_CONTENT, Gravity.TOP or Gravity.CENTER_HORIZONTAL)
+        speechParams.topMargin = dp(4)
         addView(speech, speechParams)
 
         addView(
