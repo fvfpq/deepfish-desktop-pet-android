@@ -1,0 +1,7 @@
+<resources>
+    <color name="fish_blue">#2E8BEF</color>
+    <color name="fish_light">#9BC7F5</color>
+    <color name="fish_white">#F4F8FC</color>
+    <color name="bg_main">#F3F6FA</color>
+    <color name="text_main">#1F2937</color>
+</resources>

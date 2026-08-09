@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F3F5F9"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="大肥鱼设置"
+            android:textColor="#18264B"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="桌宠行为与聊天模型"
+            android:textColor="#68748E"
+            android:textSize="13sp" />
+
+        <!-- 聊天模型 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="#FFFFFF"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="聊天模型"
+                android:textColor="#18264B"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <RadioGroup
+                android:id="@+id/provider_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/radio_pollinations"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:checked="true"
+                    android:text="免费模型"
+                    android:textSize="12sp" />
+
+                <RadioButton
+                    android:id="@+id/radio_deepseek"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="DeepSeek"
+                    android:textSize="12sp" />
+
+                <RadioButton
+                    android:id="@+id/radio_custom"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="自定义"
+                    android:textSize="12sp" />
+            </RadioGroup>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="API 地址"
+                android:textColor="#394763"
+                android:textSize="12sp" />
+
+            <EditText
+                android:id="@+id/endpoint"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/input_bg"
+                android:hint="https://..."
+                android:inputType="textUri"
+                android:paddingHorizontal="10dp"
+                android:textColor="#18264B"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="模型名称"
+                android:textColor="#394763"
+                android:textSize="12sp" />
+
+            <EditText
+                android:id="@+id/model"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/input_bg"
+                android:hint="openai-fast"
+                android:inputType="text"
+                android:paddingHorizontal="10dp"
+                android:textColor="#18264B"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="API Key"
+                android:textColor="#394763"
+                android:textSize="12sp" />
+
+            <EditText
+                android:id="@+id/api_key"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/input_bg"
+                android:inputType="textPassword"
+                android:paddingHorizontal="10dp"
+                android:textColor="#18264B"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/key_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="尚未保存 Key"
+                android:textColor="#7B879D"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- 桌宠行为 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:background="#FFFFFF"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="桌宠行为"
+                android:textColor="#18264B"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <CheckBox
+                android:id="@+id/chk_free_walk"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:checked="true"
+                android:text="自动散步：按作息在当前屏幕内来回走动"
+                android:textColor="#394763"
+                android:textSize="13sp" />
+
+            <CheckBox
+                android:id="@+id/chk_interactive_zones"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:checked="true"
+                android:text="身体区域感应：散步时经过头发、脸和腿触发反馈"
+                android:textColor="#394763"
+                android:textSize="13sp" />
+
+            <CheckBox
+                android:id="@+id/chk_spicy_lines"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:checked="true"
+                android:text="标志性台词：允许更放飞的模型梗和吐槽"
+                android:textColor="#394763"
+                android:textSize="13sp" />
+
+            <CheckBox
+                android:id="@+id/chk_always_on_top"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:checked="true"
+                android:text="始终置顶：保持在其他窗口上方"
+                android:textColor="#394763"
+                android:textSize="13sp" />
+
+            <CheckBox
+                android:id="@+id/chk_sound"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:checked="true"
+                android:text="音效（预留）"
+                android:textColor="#394763"
+                android:textSize="13sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="显示比例"
+                android:textColor="#394763"
+                android:textSize="12sp" />
+
+            <SeekBar
+                android:id="@+id/scale_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="11" />
+
+            <TextView
+                android:id="@+id/scale_output"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:text="100%"
+                android:textColor="#394763"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="行为频率"
+                android:textColor="#394763"
+                android:textSize="12sp" />
+
+            <SeekBar
+                android:id="@+id/intensity_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="13" />
+
+            <TextView
+                android:id="@+id/intensity_output"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:text="100%"
+                android:textColor="#394763"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:gravity="end"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_reset"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:backgroundTint="#FFFFFF"
+                android:text="恢复免费模型"
+                android:textColor="#3B4965"
+                android:textSize="13sp" />
+
+            <Button
+                android:id="@+id/btn_save"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:text="保存设置"
+                android:textSize="13sp" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

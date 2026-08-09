@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">蓝色大肥鱼桌宠</string>
+    <string name="start_pet">启动桌宠</string>
+    <string name="stop_pet">停止桌宠</string>
+    <string name="grant_overlay">授予悬浮窗权限</string>
+    <string name="settings">设置</string>
+    <string name="chat">聊天</string>
+    <string name="overlay_permission_hint">需要悬浮窗权限才能把桌宠显示在其他应用上层</string>
+    <string name="grant_notification">授予通知权限</string>
+</resources>
