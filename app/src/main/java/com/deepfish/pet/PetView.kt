@@ -33,6 +33,10 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
     private val character: ImageView = ImageView(context)
     private val speech: TextView = TextView(context)
     private val effectLayer: FrameLayout = FrameLayout(context)
+    private val speechTail: View = View(context)
+    private var speechParams: LayoutParams? = null
+    private var tailParams: LayoutParams? = null
+    private val charTopInset = 76
 
     private var currentFrame = "neutral"
     private var walkDirection = -1
@@ -77,17 +81,23 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
         val characterParams = LayoutParams(
             LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
         )
-        characterParams.topMargin = dp(76)
+        characterParams.topMargin = dp(charTopInset)
         addView(character, characterParams)
 
-        speech.setTextColor(Color.rgb(20, 35, 80))
-        speech.setBackgroundColor(Color.argb(245, 255, 255, 255))
-        speech.textSize = 13f
-        speech.setPadding(dp(12), dp(8), dp(12), dp(8))
+        speech.setTextColor(Color.rgb(51, 65, 92))
+        speech.setBackgroundResource(R.drawable.bubble_pet_bg)
+        speech.textSize = 14f
+        speech.setPadding(dp(14), dp(10), dp(14), dp(10))
+        speech.setLineSpacing(0f, 1.3f)
         speech.alpha = 0f
-        val speechParams = LayoutParams(dp(260), LayoutParams.WRAP_CONTENT, Gravity.TOP or Gravity.CENTER_HORIZONTAL)
-        speechParams.topMargin = dp(4)
+        speech.setOnClickListener { dismissSpeech() }
+        speechParams = LayoutParams(dp(250), LayoutParams.WRAP_CONTENT, Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL)
         addView(speech, speechParams)
+
+        speechTail.background = drawableOf(R.drawable.bubble_pet_tail)
+        speechTail.alpha = 0f
+        tailParams = LayoutParams(dp(22), dp(12), Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL)
+        addView(speechTail, tailParams)
 
         addView(
             effectLayer,
@@ -104,7 +114,29 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
         startBreathing()
     }
 
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        val charHeight = h - dp(charTopInset)
+        val tailH = dp(12)
+        speechParams?.let {
+            it.bottomMargin = charHeight + dp(6)
+            speech.layoutParams = it
+        }
+        tailParams?.let {
+            it.bottomMargin = charHeight - (tailH / 2) + dp(6)
+            speechTail.layoutParams = it
+        }
+    }
+
     private fun dp(v: Int): Int = (v * resources.displayMetrics.density).toInt()
+
+    private fun drawableOf(res: Int) = androidx.core.content.ContextCompat.getDrawable(context, res)
+
+    private fun dismissSpeech() {
+        removeCallbacks(speechTimer)
+        speech.animate().alpha(0f).setDuration(180).start()
+        speechTail.animate().alpha(0f).setDuration(180).start()
+    }
 
     private fun isSleepPhase(): Boolean = BodyClock.getPhase().id == "sleep"
 
@@ -169,11 +201,11 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
         val phase = BodyClock.getPhase()
         speech.text = "${label ?: phase.label}\n${Behaviors.stripHints(text)}"
         speech.alpha = 0f
+        speechTail.alpha = 0f
         speech.animate().alpha(1f).setDuration(180).start()
+        speechTail.animate().alpha(1f).setDuration(180).start()
         removeCallbacks(speechTimer)
-        speechTimer = Runnable {
-            speech.animate().alpha(0f).setDuration(180).start()
-        }
+        speechTimer = Runnable { dismissSpeech() }
         postDelayed(speechTimer, duration)
     }
 
