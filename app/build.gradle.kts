@@ -11,8 +11,8 @@ android {
         applicationId = "com.deepfish.pet"
         minSdk = 26
         targetSdk = 34
-        versionCode = 15
-        versionName = "1.3.0"
+        versionCode = 16
+        versionName = "1.4.0"
     }
 
     buildTypes {
@@ -38,4 +38,5 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("org.bouncycastle:bcprov-jdk18on:1.77")
+    implementation("org.apache.commons:commons-compress:1.21")
 }

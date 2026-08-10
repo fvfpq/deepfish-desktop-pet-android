@@ -39,6 +39,7 @@ object Prefs {
     private const val KEY_GATEWAY_HOST = "gateway_host"
     private const val KEY_GATEWAY_PORT = "gateway_port"
     private const val KEY_GATEWAY_TOKEN = "gateway_token"
+    private const val KEY_GATEWAY_EMBEDDED = "gateway_embedded"
     const val DEFAULT_GATEWAY_HOST = "127.0.0.1"
     const val DEFAULT_GATEWAY_PORT = 18789
 
@@ -95,6 +96,13 @@ object Prefs {
     fun gatewayPort(context: Context): Int = sp(context).getInt(KEY_GATEWAY_PORT, DEFAULT_GATEWAY_PORT)
 
     fun gatewayToken(context: Context): String? = sp(context).getString(KEY_GATEWAY_TOKEN, null)
+
+    /** 是否使用内置 Gateway（随 APK 自带 rootfs，无需 Termux）。默认开启。 */
+    fun gatewayEmbedded(context: Context): Boolean = sp(context).getBoolean(KEY_GATEWAY_EMBEDDED, true)
+
+    fun setGatewayEmbedded(context: Context, value: Boolean) {
+        sp(context).edit().putBoolean(KEY_GATEWAY_EMBEDDED, value).apply()
+    }
 
     fun saveGatewayConfig(context: Context, host: String, port: Int, token: String?) {
         sp(context).edit()

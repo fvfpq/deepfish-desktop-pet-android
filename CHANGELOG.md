@@ -1,5 +1,17 @@
 # 更新记录
 
+## v1.4.0（2026-08-10）— 内置 openclaw Gateway（无需 Termux）
+
+- **完整内置 openclaw Gateway**：APK 自带 Ubuntu arm64 rootfs + Node.js 24 + openclaw（约 700MB 解压到应用数据目录），无需安装 Termux、无需任何下载
+- 首次启用自动解压内置运行时（约 1-2 分钟），之后直接作为 node 连接自身（127.0.0.1:18789）
+- 内置 proot 运行时（Termux 同款机制），在 Android 上直接启动 Gateway 进程
+- 设置页新增「内置 Gateway」控制：部署进度显示、启动/停止按钮
+- 支持连接外部 Gateway 作为备选（地址/端口/Token 配置保留）
+- 修复：Android 9+ 明文流量拦截导致本机 Gateway 连接失败（usesCleartextTraffic）
+- APK 体积增至约 173MB（含内置运行时）
+
+**下载**：`deepfish-pet-android-1.4.0.apk`
+
 ## v1.3.0（2026-08-10）— 接入 openclaw Gateway
 
 - 桌宠作为 node 连接手机上的 openclaw Gateway（如 Termux 中运行），向它暴露手机操作能力（mobile-ui.observe / mobile-ui.act）

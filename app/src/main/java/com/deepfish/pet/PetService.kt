@@ -16,6 +16,12 @@ import android.content.Context
 import android.content.IntentFilter
 import com.deepfish.pet.chat.ChatOverlay
 import com.deepfish.pet.gateway.GatewayController
+import com.deepfish.pet.gateway.GatewayDeployManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class PetService : Service(), PetWindowHost {
 
@@ -67,7 +73,39 @@ class PetService : Service(), PetWindowHost {
         startForeground(NOTIFICATION_ID, buildNotification())
         registerScreenReceiver()
         if (Prefs.gatewayEnabled(this)) {
-            GatewayController.ensureStarted(this)
+            startGatewayStack()
+        }
+    }
+
+    /**
+     * 启动完整 Gateway 链路：内置部署（若启用）→ 连接。
+     */
+    private fun startGatewayStack() {
+        GatewayController.ensureStarted(this)
+        val useEmbedded = Prefs.gatewayEmbedded(this)
+        if (useEmbedded) {
+            val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+            scope.launch {
+                try {
+                    if (!GatewayDeployManager.isDeployed(this@PetService)) {
+                        GatewayDeployManager.deploy(this@PetService)
+                    }
+                    GatewayDeployManager.start(this@PetService)
+                    // 等待 gateway 进程就绪后连接（最多 30s）
+                    var attempts = 0
+                    while (attempts < 30 && !GatewayDeployManager.isRunning) {
+                        delay(1000)
+                        attempts++
+                    }
+                    delay(3000)
+                    if (GatewayDeployManager.isRunning) {
+                        GatewayController.startFromPrefs(this@PetService)
+                    }
+                } catch (e: Exception) {
+                    android.util.Log.e("PetService", "embedded gateway start failed", e)
+                }
+            }
+        } else {
             GatewayController.startFromPrefs(this)
         }
     }
@@ -98,6 +136,7 @@ class PetService : Service(), PetWindowHost {
         petView = null
         if (Prefs.gatewayEnabled(this)) {
             GatewayController.stop()
+            GatewayDeployManager.stop(this)
         }
         super.onDestroy()
     }

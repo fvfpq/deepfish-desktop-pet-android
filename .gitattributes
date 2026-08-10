@@ -1,0 +1,2 @@
+# 内置 Gateway 运行时 rootfs（大文件走 Git LFS）
+app/src/main/assets/rootfs.dat filter=lfs diff=lfs merge=lfs -text

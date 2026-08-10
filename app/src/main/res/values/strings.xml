@@ -12,5 +12,5 @@
     <string name="accessibility_service_summary">根据桌宠聊天指令操作手机界面</string>
     <string name="accessibility_hint">需要无障碍权限，桌宠才能按你的指令帮你操作手机</string>
     <string name="gateway_ping">检测连通性</string>
-    <string name="gateway_guide">Termux 一键搭建 Gateway：\n1. 安装 Termux 后运行：\n   bash -c \"$(curl -fsSL https://raw.githubusercontent.com/mithun50/openclaw-termux/main/install.sh)\"\n2. 按提示完成安装，启动后访问仪表盘：\n   http://127.0.0.1:18789\n3. 首次连接时桌宠会自动配对（无需手动审批）\n4. 若提示需要 Token，可在仪表盘地址中的 token= 参数或 openclaw.json 中查看</string>
+    <string name="gateway_guide">内置 Gateway：首次启动会自动解压内置运行时（约 700MB 解压到应用数据目录，耗时约 1-2 分钟），之后直接作为 node 连接自身。\n如需连接外部 Gateway（如电脑上的 openclaw），改用下面的地址/Token 并点「连接 Gateway」。</string>
 </resources>

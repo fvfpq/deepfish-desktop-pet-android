@@ -17,6 +17,7 @@ import com.deepfish.pet.Prefs
 import com.deepfish.pet.R
 import com.deepfish.pet.accessibility.PhoneOperator
 import com.deepfish.pet.gateway.GatewayController
+import com.deepfish.pet.gateway.GatewayDeployManager
 import com.deepfish.pet.gateway.GatewayNode
 import kotlinx.coroutines.launch
 
@@ -45,6 +46,7 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var gatewayPort: EditText
     private lateinit var gatewayToken: EditText
     private lateinit var gatewayStatus: TextView
+    private lateinit var gatewayDeployStatus: TextView
 
     private val presets = mapOf(
         "pollinations" to (Prefs.DEFAULT_ENDPOINT to Prefs.DEFAULT_MODEL),
@@ -76,12 +78,36 @@ class SettingsActivity : AppCompatActivity() {
         gatewayPort = findViewById(R.id.gateway_port)
         gatewayToken = findViewById(R.id.gateway_token)
         gatewayStatus = findViewById(R.id.gateway_status)
+        gatewayDeployStatus = findViewById(R.id.gateway_deploy_status)
 
         findViewById<Button>(R.id.btn_gateway_ping).setOnClickListener { pingGateway() }
         findViewById<Button>(R.id.btn_gateway_connect).setOnClickListener { saveGateway() }
         findViewById<Button>(R.id.btn_gateway_disconnect).setOnClickListener {
             GatewayController.stop()
             updateGatewayStatus()
+        }
+        findViewById<Button>(R.id.btn_gateway_start).setOnClickListener {
+            lifecycleScope.launch {
+                runCatching {
+                    if (!GatewayDeployManager.isDeployed(this@SettingsActivity)) {
+                        GatewayDeployManager.deploy(this@SettingsActivity)
+                    }
+                    GatewayDeployManager.start(this@SettingsActivity)
+                }.onFailure { e ->
+                    gatewayDeployStatus.text = "内置 Gateway 启动失败: ${e.message}"
+                }
+                updateDeployStatus()
+            }
+        }
+        findViewById<Button>(R.id.btn_gateway_stop).setOnClickListener {
+            GatewayDeployManager.stop(this)
+            updateDeployStatus()
+        }
+
+        lifecycleScope.launch {
+            GatewayDeployManager.status.collect {
+                updateDeployStatus()
+            }
         }
 
         lifecycleScope.launch {
@@ -194,6 +220,20 @@ class SettingsActivity : AppCompatActivity() {
                 gatewayStatus.text = "未连接"
             is GatewayNode.ConnectionState.Error ->
                 gatewayStatus.text = "连接失败：${s.message}"
+        }
+    }
+
+    private fun updateDeployStatus() {
+        val st = GatewayDeployManager.status.value
+        gatewayDeployStatus.text = when (st.state) {
+            GatewayDeployManager.DeployState.NotDeployed -> "内置 Gateway：未部署"
+            GatewayDeployManager.DeployState.Extracting -> "内置 Gateway：解压中… ${(st.progress * 100).toInt()}%"
+            GatewayDeployManager.DeployState.Ready -> "内置 Gateway：就绪，未启动"
+            GatewayDeployManager.DeployState.Starting -> "内置 Gateway：启动中…"
+            GatewayDeployManager.DeployState.Running -> "内置 Gateway：运行中（pid ${st.pid}）"
+            GatewayDeployManager.DeployState.Stopping -> "内置 Gateway：停止中…"
+            GatewayDeployManager.DeployState.Stopped -> "内置 Gateway：已停止"
+            GatewayDeployManager.DeployState.Error -> "内置 Gateway：异常 ${st.error ?: ""}"
         }
     }
 

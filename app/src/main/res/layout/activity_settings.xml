@@ -324,9 +324,38 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:text="桌宠作为 node 连接手机上的 openclaw Gateway（如 Termux 中运行），向它暴露手机操作能力。"
+                android:text="内置 openclaw Gateway 已随 APK 附带（无需安装 Termux）。可也连接外部 Gateway 作为备选。"
                 android:textColor="#7B879D"
                 android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/gateway_deploy_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="#F6F8FC"
+                android:padding="10dp"
+                android:text="内置 Gateway：未启动"
+                android:textColor="#394763"
+                android:textSize="12sp" />
+
+            <Button
+                android:id="@+id/btn_gateway_start"
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:layout_marginTop="8dp"
+                android:text="启动内置 Gateway"
+                android:textSize="13sp" />
+
+            <Button
+                android:id="@+id/btn_gateway_stop"
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:layout_marginTop="6dp"
+                android:backgroundTint="#FFFFFF"
+                android:text="停止内置 Gateway"
+                android:textColor="#3B4965"
+                android:textSize="13sp" />
 
             <CheckBox
                 android:id="@+id/chk_gateway_enabled"
