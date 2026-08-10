@@ -15,6 +15,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.IntentFilter
 import com.deepfish.pet.chat.ChatOverlay
+import com.deepfish.pet.gateway.GatewayController
 
 class PetService : Service(), PetWindowHost {
 
@@ -65,6 +66,10 @@ class PetService : Service(), PetWindowHost {
         createNotificationChannel()
         startForeground(NOTIFICATION_ID, buildNotification())
         registerScreenReceiver()
+        if (Prefs.gatewayEnabled(this)) {
+            GatewayController.ensureStarted(this)
+            GatewayController.startFromPrefs(this)
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -91,6 +96,9 @@ class PetService : Service(), PetWindowHost {
         unregisterReceiver(screenReceiver)
         petView?.let { windowManager?.removeView(it) }
         petView = null
+        if (Prefs.gatewayEnabled(this)) {
+            GatewayController.stop()
+        }
         super.onDestroy()
     }
 

@@ -303,6 +303,128 @@
                 android:textSize="13sp" />
         </LinearLayout>
 
+        <!-- openclaw Gateway -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:background="#FFFFFF"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="openclaw Gateway"
+                android:textColor="#18264B"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="桌宠作为 node 连接手机上的 openclaw Gateway（如 Termux 中运行），向它暴露手机操作能力。"
+                android:textColor="#7B879D"
+                android:textSize="12sp" />
+
+            <CheckBox
+                android:id="@+id/chk_gateway_enabled"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="启用 Gateway 连接（随桌宠启动）"
+                android:textColor="#394763"
+                android:textSize="13sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Gateway 地址"
+                android:textColor="#394763"
+                android:textSize="12sp" />
+
+            <EditText
+                android:id="@+id/gateway_host"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/input_bg"
+                android:hint="127.0.0.1"
+                android:inputType="text"
+                android:paddingHorizontal="10dp"
+                android:textColor="#18264B"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="端口"
+                android:textColor="#394763"
+                android:textSize="12sp" />
+
+            <EditText
+                android:id="@+id/gateway_port"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/input_bg"
+                android:hint="18789"
+                android:inputType="number"
+                android:paddingHorizontal="10dp"
+                android:textColor="#18264B"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Gateway Token（可选，本地连接可留空，首次连接会自动配对）"
+                android:textColor="#394763"
+                android:textSize="12sp" />
+
+            <EditText
+                android:id="@+id/gateway_token"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/input_bg"
+                android:hint="从 openclaw.json 或 dashboard URL 获取"
+                android:inputType="textPassword"
+                android:paddingHorizontal="10dp"
+                android:textColor="#18264B"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/gateway_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="未连接"
+                android:textColor="#7B879D"
+                android:textSize="12sp" />
+
+            <Button
+                android:id="@+id/btn_gateway_connect"
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:layout_marginTop="10dp"
+                android:text="连接 Gateway"
+                android:textSize="13sp" />
+
+            <Button
+                android:id="@+id/btn_gateway_disconnect"
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:layout_marginTop="6dp"
+                android:backgroundTint="#FFFFFF"
+                android:text="断开连接"
+                android:textColor="#3B4965"
+                android:textSize="13sp" />
+        </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

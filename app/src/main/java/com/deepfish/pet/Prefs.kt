@@ -35,6 +35,12 @@ object Prefs {
     private const val KEY_BEHAVIOR_INTENSITY = "behavior_intensity"
     private const val KEY_TOUCH_THROUGH = "touch_through"
     private const val KEY_AUTO_START = "auto_start"
+    private const val KEY_GATEWAY_ENABLED = "gateway_enabled"
+    private const val KEY_GATEWAY_HOST = "gateway_host"
+    private const val KEY_GATEWAY_PORT = "gateway_port"
+    private const val KEY_GATEWAY_TOKEN = "gateway_token"
+    const val DEFAULT_GATEWAY_HOST = "127.0.0.1"
+    const val DEFAULT_GATEWAY_PORT = 18789
 
     private fun sp(context: Context): SharedPreferences =
         context.applicationContext.getSharedPreferences(FILE, Context.MODE_PRIVATE)
@@ -75,5 +81,26 @@ object Prefs {
 
     fun setAutoStart(context: Context, value: Boolean) {
         sp(context).edit().putBoolean(KEY_AUTO_START, value).apply()
+    }
+
+    fun gatewayEnabled(context: Context): Boolean = sp(context).getBoolean(KEY_GATEWAY_ENABLED, false)
+
+    fun setGatewayEnabled(context: Context, value: Boolean) {
+        sp(context).edit().putBoolean(KEY_GATEWAY_ENABLED, value).apply()
+    }
+
+    fun gatewayHost(context: Context): String =
+        sp(context).getString(KEY_GATEWAY_HOST, DEFAULT_GATEWAY_HOST) ?: DEFAULT_GATEWAY_HOST
+
+    fun gatewayPort(context: Context): Int = sp(context).getInt(KEY_GATEWAY_PORT, DEFAULT_GATEWAY_PORT)
+
+    fun gatewayToken(context: Context): String? = sp(context).getString(KEY_GATEWAY_TOKEN, null)
+
+    fun saveGatewayConfig(context: Context, host: String, port: Int, token: String?) {
+        sp(context).edit()
+            .putString(KEY_GATEWAY_HOST, host.trim())
+            .putInt(KEY_GATEWAY_PORT, port)
+            .putString(KEY_GATEWAY_TOKEN, token?.trim()?.takeIf { it.isNotEmpty() })
+            .apply()
     }
 }

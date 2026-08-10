@@ -19,9 +19,12 @@ import com.deepfish.pet.ApiKeyStore
 import com.deepfish.pet.Prefs
 import com.deepfish.pet.R
 import com.deepfish.pet.accessibility.PhoneOperator
+import com.deepfish.pet.gateway.GatewayController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.json.JSONArray
+import org.json.JSONObject
 
 /**
  * 聊天悬浮窗：透明背景、可拖动，不跳转 Activity。
@@ -201,7 +204,9 @@ class ChatOverlay(private val context: Context) {
 
         kotlinx.coroutines.CoroutineScope(Dispatchers.Main).launch {
             try {
-                if (isOperateInstruction(content)) {
+                if (GatewayController.isConnected) {
+                    sendViaGateway(content, pending)
+                } else if (isOperateInstruction(content)) {
                     handleOperateInstruction(content, pending)
                 } else {
                     val settings = Prefs.settings(context)
@@ -217,6 +222,22 @@ class ChatOverlay(private val context: Context) {
             } finally {
                 sendBtn?.isEnabled = true
             }
+        }
+    }
+
+    private suspend fun sendViaGateway(content: String, pending: TextView) {
+        val reply = try {
+            GatewayController.sendChatAwait(content)
+        } catch (e: Exception) {
+            null
+        }
+        if (reply.isNullOrBlank()) {
+            pending.text = "没有收到回复（检查 Gateway 是否运行中）"
+            pending.setBackgroundColor(0xFFFFF3D6.toInt())
+            pending.setTextColor(0xFF7A5A00.toInt())
+        } else {
+            pending.text = reply
+            messages += ChatMessage("assistant", reply)
         }
     }
 

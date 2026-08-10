@@ -9,12 +9,16 @@ import android.widget.RadioGroup
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.deepfish.pet.ApiKeyStore
 import com.deepfish.pet.PetService
 import com.deepfish.pet.PetSettings
 import com.deepfish.pet.Prefs
 import com.deepfish.pet.R
 import com.deepfish.pet.accessibility.PhoneOperator
+import com.deepfish.pet.gateway.GatewayController
+import com.deepfish.pet.gateway.GatewayNode
+import kotlinx.coroutines.launch
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -35,6 +39,12 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var scaleOutput: TextView
     private lateinit var intensityBar: SeekBar
     private lateinit var intensityOutput: TextView
+
+    private lateinit var chkGatewayEnabled: CheckBox
+    private lateinit var gatewayHost: EditText
+    private lateinit var gatewayPort: EditText
+    private lateinit var gatewayToken: EditText
+    private lateinit var gatewayStatus: TextView
 
     private val presets = mapOf(
         "pollinations" to (Prefs.DEFAULT_ENDPOINT to Prefs.DEFAULT_MODEL),
@@ -61,6 +71,23 @@ class SettingsActivity : AppCompatActivity() {
         scaleOutput = findViewById(R.id.scale_output)
         intensityBar = findViewById(R.id.intensity_bar)
         intensityOutput = findViewById(R.id.intensity_output)
+        chkGatewayEnabled = findViewById(R.id.chk_gateway_enabled)
+        gatewayHost = findViewById(R.id.gateway_host)
+        gatewayPort = findViewById(R.id.gateway_port)
+        gatewayToken = findViewById(R.id.gateway_token)
+        gatewayStatus = findViewById(R.id.gateway_status)
+
+        findViewById<Button>(R.id.btn_gateway_connect).setOnClickListener { saveGateway() }
+        findViewById<Button>(R.id.btn_gateway_disconnect).setOnClickListener {
+            GatewayController.stop()
+            updateGatewayStatus()
+        }
+
+        lifecycleScope.launch {
+            GatewayController.state.collect {
+                updateGatewayStatus()
+            }
+        }
 
         findViewById<Button>(R.id.btn_reset).setOnClickListener { selectProvider("pollinations", true) }
         findViewById<Button>(R.id.btn_save).setOnClickListener { save() }
@@ -114,6 +141,39 @@ class SettingsActivity : AppCompatActivity() {
         scaleOutput.text = "${(s.scale * 100).toInt()}%"
         intensityOutput.text = "${(s.behaviorIntensity * 100).toInt()}%"
         keyStatus.text = if (ApiKeyStore.hasKey(this)) "已加密保存，留空即可保留" else "尚未保存 Key"
+        loadGateway()
+        updateGatewayStatus()
+    }
+
+    private fun loadGateway() {
+        chkGatewayEnabled.isChecked = Prefs.gatewayEnabled(this)
+        gatewayHost.setText(Prefs.gatewayHost(this))
+        gatewayPort.setText(Prefs.gatewayPort(this).toString())
+        gatewayToken.setText(Prefs.gatewayToken(this) ?: "")
+    }
+
+    private fun saveGateway() {
+        val host = gatewayHost.text.toString().trim().ifEmpty { "127.0.0.1" }
+        val port = gatewayPort.text.toString().trim().toIntOrNull() ?: 18789
+        val token = gatewayToken.text.toString().trim().takeIf { it.isNotEmpty() }
+        Prefs.saveGatewayConfig(this, host, port, token)
+        Prefs.setGatewayEnabled(this, chkGatewayEnabled.isChecked)
+        GatewayController.ensureStarted(this)
+        GatewayController.start(this, host, port, token)
+        updateGatewayStatus()
+    }
+
+    private fun updateGatewayStatus() {
+        when (val s = GatewayController.state.value) {
+            is GatewayNode.ConnectionState.Connected ->
+                gatewayStatus.text = "已连接（server ${s.serverVersion}）"
+            GatewayNode.ConnectionState.Connecting ->
+                gatewayStatus.text = "连接中..."
+            GatewayNode.ConnectionState.Disconnected ->
+                gatewayStatus.text = "未连接"
+            is GatewayNode.ConnectionState.Error ->
+                gatewayStatus.text = "连接失败：${s.message}"
+        }
     }
 
     private fun selectProvider(provider: String, fillPreset: Boolean) {
