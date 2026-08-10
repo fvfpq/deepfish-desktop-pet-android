@@ -125,6 +125,11 @@ class PetService : Service(), PetWindowHost {
             Intent(this, PetService::class.java).setAction(ACTION_TOGGLE_TOUCH),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
+        val chatIntent = PendingIntent.getService(
+            this, 3,
+            Intent(this, PetService::class.java).setAction(ACTION_SHOW_CHAT),
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
         val touchOn = Prefs.settings(this).touchThrough
         val builder = Notification.Builder(this, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_menu_compass)
@@ -132,6 +137,11 @@ class PetService : Service(), PetWindowHost {
             .setContentText(if (touchOn) "已开启防误触（触摸穿透）" else "我在这里陪着你哦～")
             .setContentIntent(pending)
             .setOngoing(true)
+            .addAction(
+                android.R.drawable.ic_menu_send,
+                "聊天",
+                chatIntent
+            )
             .addAction(
                 android.R.drawable.ic_lock_lock,
                 if (touchOn) "关闭防误触" else "防误触",
