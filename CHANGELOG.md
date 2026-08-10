@@ -6,6 +6,8 @@
 - 设置页新增「openclaw Gateway」区块：启用开关、地址/端口/Token 配置、连接状态与连接/断开按钮
 - 启用后桌宠启动时自动连接 Gateway，聊天消息优先经 Gateway 转发，回复通过 Gateway 事件流接收
 - 设备身份使用 Ed25519 签名（SHA-256 hex 设备 ID），Gateway 连接已启用时自动配对
+- 设置页新增「检测连通性」按钮，一键确认本机 Gateway 端口是否可达
+- 设置页内置 Termux 一键搭建 Gateway 的引导文案
 
 **下载**：`deepfish-pet-android-1.3.0.apk`
 

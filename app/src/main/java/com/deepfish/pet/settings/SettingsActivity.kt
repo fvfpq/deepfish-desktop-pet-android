@@ -77,6 +77,7 @@ class SettingsActivity : AppCompatActivity() {
         gatewayToken = findViewById(R.id.gateway_token)
         gatewayStatus = findViewById(R.id.gateway_status)
 
+        findViewById<Button>(R.id.btn_gateway_ping).setOnClickListener { pingGateway() }
         findViewById<Button>(R.id.btn_gateway_connect).setOnClickListener { saveGateway() }
         findViewById<Button>(R.id.btn_gateway_disconnect).setOnClickListener {
             GatewayController.stop()
@@ -150,6 +151,26 @@ class SettingsActivity : AppCompatActivity() {
         gatewayHost.setText(Prefs.gatewayHost(this))
         gatewayPort.setText(Prefs.gatewayPort(this).toString())
         gatewayToken.setText(Prefs.gatewayToken(this) ?: "")
+    }
+
+    private fun pingGateway() {
+        val host = gatewayHost.text.toString().trim().ifEmpty { "127.0.0.1" }
+        val port = gatewayPort.text.toString().trim().toIntOrNull() ?: 18789
+        gatewayStatus.text = "检测中..."
+        lifecycleScope.launch {
+            val reachable = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                runCatching {
+                    java.net.Socket().use { socket ->
+                        socket.connect(java.net.InetSocketAddress(host, port), 5000)
+                    }
+                }.isSuccess
+            }
+            gatewayStatus.text = if (reachable) {
+                "端口 $port 可达，Gateway 服务正在运行"
+            } else {
+                "无法连接 $host:$port（请确认 Termux 中已启动 Gateway）"
+            }
+        }
     }
 
     private fun saveGateway() {

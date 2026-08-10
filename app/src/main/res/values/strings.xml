@@ -11,4 +11,6 @@
     <string name="accessibility_service_description">桌宠使用无障碍能力根据你的指令操作手机（点击、滑动、输入文字等），例如打开应用、帮忙操作界面。无障碍权限仅在收到明确指令时执行操作。</string>
     <string name="accessibility_service_summary">根据桌宠聊天指令操作手机界面</string>
     <string name="accessibility_hint">需要无障碍权限，桌宠才能按你的指令帮你操作手机</string>
+    <string name="gateway_ping">检测连通性</string>
+    <string name="gateway_guide">Termux 一键搭建 Gateway：\n1. 安装 Termux 后运行：\n   bash -c \"$(curl -fsSL https://raw.githubusercontent.com/mithun50/openclaw-termux/main/install.sh)\"\n2. 按提示完成安装，启动后访问仪表盘：\n   http://127.0.0.1:18789\n3. 首次连接时桌宠会自动配对（无需手动审批）\n4. 若提示需要 Token，可在仪表盘地址中的 token= 参数或 openclaw.json 中查看</string>
 </resources>
