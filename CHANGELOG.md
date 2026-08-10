@@ -8,6 +8,7 @@
 - 设备身份使用 Ed25519 签名（SHA-256 hex 设备 ID），Gateway 连接已启用时自动配对
 - 设置页新增「检测连通性」按钮，一键确认本机 Gateway 端口是否可达
 - 设置页内置 Termux 一键搭建 Gateway 的引导文案
+- 桌宠人设调整为 deepseek娘：蓝色小鲸鱼女仆，傲娇可爱、喜欢卖萌
 
 **下载**：`deepfish-pet-android-1.3.0.apk`
 
