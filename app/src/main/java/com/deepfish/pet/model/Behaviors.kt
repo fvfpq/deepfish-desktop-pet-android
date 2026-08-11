@@ -45,17 +45,22 @@ object Behaviors {
         Behavior("stretch", "stretch", "sleep", "Z", 1500, "你回来啦，我也刚好伸完懒腰。"),
         Behavior("startle", "startle", "shock", "‼", 1000, "吓我一跳，你回来啦。"),
         Behavior("dizzy", "dizzy", "shock", "✦", 2800, "停停停……大肥鱼被你转晕了。"),
+        Behavior("dance", "ciallo", "happy", "♪", 3600, "祖传舞步，想学得加钱。"),
+        Behavior("jump", "fly", "happy", "↑", 2200, "蹦一下，证明我还活着。"),
+        Behavior("cheer", "smug", "happy", "🎉", 2600, "搞定！还不快夸我。"),
+        Behavior("wonder", "neutral", "curious", "?", 1800, "嗯？这个角度有点意思。"),
+        Behavior("nap", "sleep", "sleep", "Z", 5200, "小眯一下，模型不扣钱。"),
         Behavior("goAway", "go-away", "smug", "♡", 2100, "去别的地方玩，不要耽误 AGI 训练。")
     ).associateBy { it.id }
 
     val scenePlans = mapOf(
-        "sleep" to listOf("sleep", "sleep", "dream"),
-        "morning" to listOf("walk", "stretch", "hungry", "ciallo"),
-        "focus" to listOf("work", "coffee", "think", "panic"),
-        "lunch" to listOf("hungry", "wash", "feed", "sit"),
-        "afternoon" to listOf("work", "toy", "walk", "smug"),
-        "evening" to listOf("walk", "toy", "coffee", "sit"),
-        "default" to listOf("walk", "toy", "think")
+        "sleep" to listOf("sleep", "sleep", "dream", "nap"),
+        "morning" to listOf("walk", "stretch", "hungry", "ciallo", "cheer"),
+        "focus" to listOf("work", "coffee", "think", "panic", "dance"),
+        "lunch" to listOf("hungry", "wash", "feed", "sit", "wonder"),
+        "afternoon" to listOf("work", "toy", "walk", "smug", "jump", "dance"),
+        "evening" to listOf("walk", "toy", "coffee", "sit", "wonder"),
+        "default" to listOf("walk", "toy", "think", "jump")
     )
 
     fun get(id: String): Behavior = behaviors[id] ?: behaviors.getValue("think")

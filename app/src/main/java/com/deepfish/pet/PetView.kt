@@ -62,7 +62,8 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
     )
 
     private val signaturePool = listOf(
-        "ciallo", "smug", "pressure", "shock", "fly", "price", "rival", "goAway", "stranded"
+        "ciallo", "smug", "pressure", "shock", "fly", "price", "rival", "goAway", "stranded",
+        "dance", "jump", "cheer", "wonder"
     )
 
     init {
@@ -199,13 +200,19 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
     }
 
     private fun playBehaviorFrames(name: String, duration: Long) {
-        if (name != "ciallo") {
-            playFrame(name, duration)
+        if (name == "ciallo" || name == "dance") {
+            val frames = if (name == "dance") arrayOf("ciallo", "ciallo-b", "smug", "ciallo-b")
+            else arrayOf("ciallo", "ciallo-b")
+            startFrameLoop(frames, if (name == "dance") intArrayOf(300, 300, 380, 300) else intArrayOf(420, 420))
+            frameTimer = Runnable { stopFramePlayback() }
+            postDelayed(frameTimer, duration)
             return
         }
-        startFrameLoop(arrayOf("ciallo", "ciallo-b"), intArrayOf(420, 420))
-        frameTimer = Runnable { stopFramePlayback() }
-        postDelayed(frameTimer, duration)
+        if (name == "jump") {
+            playFrame("fly", duration)
+            return
+        }
+        playFrame(name, duration)
     }
 
     // ---- Speech bubble ----
@@ -240,6 +247,10 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
             "shock", "panic" -> startShakeLoop(duration, 180L, 4f)
             "angry", "rival" -> startShakeLoop(duration, 300L, 3f)
             "dizzy" -> startShakeLoop(duration, 460L, 7f)
+            "dance" -> startDanceLoop(duration)
+            "jump" -> startJumpLoop(duration)
+            "cheer" -> startCheerLoop(duration)
+            "wonder" -> playSequence(listOf(0f, 0f, 0f), listOf(8f, -8f, 0f), listOf(duration / 3, duration / 3, duration / 3))
             "fly" -> playSequence(listOf(-45f, 0f), listOf(8f, 0f), listOf(duration / 2, duration / 2))
             "ciallo" -> startSwayLoop(duration, 8f, 450L)
             "sleep" -> playSequence(listOf(7f, 7f, 7f), listOf(5f, 5f, 5f), listOf(duration / 3, duration / 3, duration / 3))
@@ -290,6 +301,59 @@ class PetView(context: Context, attrs: AttributeSet? = null) :
         }
         shakeTimer!!.run()
         shakeEndTimer = Runnable { shakeTimer = null; character.animate().translationX(0f).setDuration(150).start() }
+        postDelayed(shakeEndTimer, duration)
+    }
+
+    private fun startDanceLoop(duration: Long) {
+        character.animate().cancel()
+        removeCallbacks(shakeTimer)
+        removeCallbacks(shakeEndTimer)
+        var toggle = true
+        shakeTimer = object : Runnable {
+            override fun run() {
+                toggle = !toggle
+                val rot = if (toggle) 6f else -6f
+                val x = if (toggle) 5f else -5f
+                character.animate().rotation(rot).translationX(x).setDuration(300).start()
+                if (shakeTimer === this) postDelayed(this, 300)
+            }
+        }
+        shakeTimer!!.run()
+        shakeEndTimer = Runnable { shakeTimer = null; character.animate().rotation(0f).translationX(0f).setDuration(150).start() }
+        postDelayed(shakeEndTimer, duration)
+    }
+
+    private fun startJumpLoop(duration: Long) {
+        character.animate().cancel()
+        var up = true
+        shakeTimer = object : Runnable {
+            override fun run() {
+                up = !up
+                if (up) {
+                    character.animate().translationY(-28f).scaleX(1.05f).scaleY(1.05f).setDuration(160).start()
+                } else {
+                    character.animate().translationY(0f).scaleX(0.96f).scaleY(0.96f).setDuration(200).start()
+                }
+                if (shakeTimer === this) postDelayed(this, 380)
+            }
+        }
+        shakeTimer!!.run()
+        shakeEndTimer = Runnable { shakeTimer = null; character.animate().translationY(0f).scaleX(1f).scaleY(1f).setDuration(120).start() }
+        postDelayed(shakeEndTimer, duration)
+    }
+
+    private fun startCheerLoop(duration: Long) {
+        character.animate().cancel()
+        var toggle = true
+        shakeTimer = object : Runnable {
+            override fun run() {
+                toggle = !toggle
+                character.animate().rotation(if (toggle) 3f else -3f).translationY(if (toggle) -8f else -3f).setDuration(180).start()
+                if (shakeTimer === this) postDelayed(this, 180)
+            }
+        }
+        shakeTimer!!.run()
+        shakeEndTimer = Runnable { shakeTimer = null; character.animate().rotation(0f).translationY(0f).setDuration(120).start() }
         postDelayed(shakeEndTimer, duration)
     }
 
