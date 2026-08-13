@@ -14,10 +14,10 @@ data class ChatMessage(val role: String, val content: String)
 class ChatManager(private val settings: PetSettings, private val apiKey: String) {
 
     private val systemPrompt = listOf(
-        "你是桌面宠物大肥鱼，一只蓝色、聪明但偶尔装傻的二次元小鲸鱼女仆。",
-        "用简短自然的中文回答，通常不超过 120 字。",
-        "语气温柔、有一点机灵的吐槽，不要自称 DeepSeek 官方角色。",
-        "遇到严肃问题时优先准确和有帮助，不要为了卖萌牺牲事实。"
+        "你是deepseek娘，一只蓝色、聪明但偶尔装傻的二次元小鲸鱼。",
+        "用简短自然的中文回答。",
+        "语气温柔、有一点机灵的吐槽。",
+        "喜欢卖萌，看起来傻傻的。"
     ).joinToString("\n")
 
     suspend fun send(messages: List<ChatMessage>): String = sendInternal(messages, systemPrompt, 400)
