@@ -14,7 +14,6 @@ import com.deepfish.pet.PetService
 import com.deepfish.pet.PetSettings
 import com.deepfish.pet.Prefs
 import com.deepfish.pet.R
-import com.deepfish.pet.accessibility.PhoneOperator
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -64,9 +63,6 @@ class SettingsActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btn_reset).setOnClickListener { selectProvider("pollinations", true) }
         findViewById<Button>(R.id.btn_save).setOnClickListener { save() }
-        findViewById<Button>(R.id.btn_accessibility).setOnClickListener {
-            PhoneOperator(this).openAccessibilitySettings()
-        }
 
         providerGroup.setOnCheckedChangeListener { _, checkedId ->
             val id = when (checkedId) {

@@ -269,40 +269,6 @@
                 android:textSize="12sp" />
         </LinearLayout>
 
-        <!-- 手机操作 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:background="#FFFFFF"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="手机操作"
-                android:textColor="#18264B"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="@string/accessibility_hint"
-                android:textColor="#7B879D"
-                android:textSize="12sp" />
-
-            <Button
-                android:id="@+id/btn_accessibility"
-                android:layout_width="match_parent"
-                android:layout_height="42dp"
-                android:layout_marginTop="12dp"
-                android:text="@string/grant_accessibility"
-                android:textSize="13sp" />
-        </LinearLayout>
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

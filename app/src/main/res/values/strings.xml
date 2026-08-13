@@ -7,8 +7,4 @@
     <string name="chat">聊天</string>
     <string name="overlay_permission_hint">需要悬浮窗权限才能把桌宠显示在其他应用上层</string>
     <string name="grant_notification">授予通知权限</string>
-    <string name="grant_accessibility">授予无障碍权限</string>
-    <string name="accessibility_service_description">桌宠使用无障碍能力根据你的指令操作手机（点击、滑动、输入文字等），例如打开应用、帮忙操作界面。无障碍权限仅在收到明确指令时执行操作。</string>
-    <string name="accessibility_service_summary">根据桌宠聊天指令操作手机界面</string>
-    <string name="accessibility_hint">需要无障碍权限，桌宠才能按你的指令帮你操作手机</string>
 </resources>

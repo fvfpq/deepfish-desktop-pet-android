@@ -1,6 +1,6 @@
 # 蓝色大肥鱼桌宠 · Android 版
 
-基于 [deepfish-desktop-pet](https://github.com/Dolphin2026-stl/deepfish-desktop-pet) 移植的 Android 8.0+ 桌宠应用。沿用原项目全部帧动画素材与行为逻辑，使用原生 Kotlin 实现透明悬浮窗桌宠，并扩展了聊天、模型接入与无障碍手机操作能力。
+基于 [deepfish-desktop-pet](https://github.com/Dolphin2026-stl/deepfish-desktop-pet) 移植的 Android 8.0+ 桌宠应用。沿用原项目全部帧动画素材与行为逻辑，使用原生 Kotlin 实现透明悬浮窗桌宠，并扩展了聊天与模型接入能力。
 
 > 社区二创，不隶属于 DeepSeek 官方。角色立绘来自原项目素材，如需公开分发请确认你拥有对应素材的使用与再授权权利。
 
@@ -15,7 +15,7 @@
 
 ### 动画与行为
 
-- 31 张整帧 PNG 立绘 + 全新 5 种动画（跳舞 / 跳跃 / 欢呼 / 好奇歪头 / 小憩），共 36 种可触发行为
+- 31 张整帧 PNG 立绘 + 5 种动画（跳舞 / 跳跃 / 欢呼 / 好奇歪头 / 小憩），共 36 种可触发行为
 - 待机呼吸浮动、不定时整帧眨眼
 - 生理时钟七段状态，不同时段自动切换行为计划
 - 随机闲置彩蛋与专属「签名动作」池
@@ -25,9 +25,8 @@
 
 - 单击：点击台词 + 爱心粒子
 - 双击：打开聊天悬浮窗
-- 拖拽：移动桌宠，松手后拖拽反馈
+- 拖拽：移动桌宠，松手后根据拖动距离触发反馈
 - 快速绕圈拖动：触发晕眩（转圈星星 + 台词）
-- 拖拽距离判定：短距离松手触发「惊醒」
 
 ### 聊天与模型
 
@@ -35,13 +34,6 @@
 - 保留最近十轮上下文
 - 三种模型服务商：免费 Pollinations（默认）/ DeepSeek / 自定义 OpenAI 兼容 API
 - API Key 使用 Android Keystore AES-GCM 加密后落盘，不存明文
-
-### 无障碍手机操作（v1.2.0+）
-
-- 内嵌 openclaw（MIT）无障碍执行层
-- 在聊天中输入自然语言指令（「帮我打开微信」「帮我点一下」「回桌面」等），桌宠通过 LLM 理解屏幕节点快照并自动操作手机
-- 支持多轮「观察 -> 决策 -> 执行 -> 再观察」闭环，直到任务完成
-- 敏感输入框（密码等）自动拒绝写入
 
 ## 安装
 
@@ -56,7 +48,6 @@
 2. 允许安装来自未知来源的应用（按系统提示操作）
 3. 打开应用，点击「授予悬浮窗权限」，按系统指引完成授权
 4. 回到应用，点击「启动桌宠」
-5. 如需手机操作能力，在设置页点击「无障碍权限」并开启「大肥鱼桌宠」服务
 
 > 提示：不同厂商系统对后台弹窗的限制不同，若桌宠被系统清理，请在系统设置中将本应用加入「后台运行白名单 / 自启动白名单」。
 
@@ -128,32 +119,6 @@ Key 使用 Android Keystore AES-GCM 加密保存（每次加密使用随机 IV�
 | 人物尺寸 | 60% ~ 115% 缩放 |
 | 防误触 | 开启后触摸穿透到下层应用，不再拦截点击 |
 
-## 手机操作（无障碍）
-
-开启步骤：
-
-1. 设置页点击「无障碍权限」按钮
-2. 在系统无障碍设置中开启「大肥鱼桌宠」
-3. 回到桌宠聊天，输入操作指令即可
-
-支持指令示例：
-
-```
-帮我打开微信
-帮我点一下设置
-帮我输入"你好"
-回桌面
-帮我滑动到下一页
-帮我看一下当前屏幕
-```
-
-技术原理：
-
-1. 抓取当前屏幕的无障碍节点快照（包名、标题、节点树）
-2. 将快照压缩为文本喂给 LLM，模型返回 JSON 动作列表
-3. 通过无障碍手势执行（点击 / 输入 / 滚动 / 滑动 / 全局操作）
-4. 执行后重新读取屏幕确认结果，最多 4 轮、每轮最多 10 个动作，防止失控
-
 ## 开发与构建
 
 ### 环境要求
@@ -191,7 +156,6 @@ deepfish-desktop-pet-android/
 │     │  ├─ ApiKeyStore.kt    # Keystore AES-GCM 加密存储
 │     │  ├─ Prefs.kt          # 设置持久化
 │     │  ├─ BootReceiver.kt   # 开机自启
-│     │  ├─ accessibility/    # 无障碍手机操作（openclaw 执行层）
 │     │  ├─ chat/             # 聊天悬浮窗与模型客户端
 │     │  ├─ settings/         # 设置页
 │     │  └─ model/            # 生理时钟、行为目录、手势检测
@@ -204,9 +168,8 @@ deepfish-desktop-pet-android/
 |------|------|
 | `PetView.kt` | 帧动画播放、行为调度、粒子效果、手势识别、闲置调度 |
 | `PetService.kt` | 悬浮窗窗口管理、屏幕锁定监听、通知栏、防误触 |
-| `chat/ChatOverlay.kt` | 聊天悬浮窗 UI、操作指令识别与分发 |
+| `chat/ChatOverlay.kt` | 聊天悬浮窗 UI、发送与渲染 |
 | `chat/ChatManager.kt` | OpenAI 兼容客户端：上下文截断、错误解析 |
-| `accessibility/PhoneOperator.kt` | LLM 决策 + 无障碍执行闭环 |
 | `model/Behaviors.kt` | 行为目录、场景计划、台词与帧映射 |
 | `model/BodyClock.kt` | 生理时钟七段状态 |
 | `model/SpinTracker.kt` | 快速绕圈手势检测 |
@@ -221,7 +184,7 @@ deepfish-desktop-pet-android/
 | [v1.2.3](https://github.com/fvfpq/deepfish-desktop-pet-android/releases/tag/v1.2.3) | 防误触模式（触摸穿透） |
 | [v1.2.2](https://github.com/fvfpq/deepfish-desktop-pet-android/releases/tag/v1.2.2) | 人形进一步缩小 |
 | [v1.2.1](https://github.com/fvfpq/deepfish-desktop-pet-android/releases/tag/v1.2.1) | 修复自定义模型 404（自动补全 /chat/completions） |
-| [v1.2.0](https://github.com/fvfpq/deepfish-desktop-pet-android/releases/tag/v1.2.0) | 接入 openclaw 无障碍能力，可指令操作手机 |
+| [v1.2.0](https://github.com/fvfpq/deepfish-desktop-pet-android/releases/tag/v1.2.0) | 接入 openclaw 无障碍能力（后续版本已移除） |
 | [v1.1.3](https://github.com/fvfpq/deepfish-desktop-pet-android/releases/tag/v1.1.3) | 进一步缩小人形，气泡文字居中 |
 | [v1.1.2](https://github.com/fvfpq/deepfish-desktop-pet-android/releases/tag/v1.1.2) | 气泡简化 + 人形缩小 |
 | [v1.1.1](https://github.com/fvfpq/deepfish-desktop-pet-android/releases/tag/v1.1.1) | 修复肢体动作不播放 + 绕圈闪退加固 |
@@ -243,14 +206,10 @@ deepfish-desktop-pet-android/
 **聊天一直「没连上模型」？**
 免费模型依赖公共接口，可能受网络影响；可切换到自备的 DeepSeek 或自定义 Key 使用。
 
-**手机操作指令没反应？**
-确认已在系统无障碍设置中开启「大肥鱼桌宠」服务，且当前屏幕存在可操作节点。
-
 ## 贡献者
 
 - [fvfpq](https://github.com/fvfpq) — Android 移植与维护
 - [Dolphin2026-stl](https://github.com/Dolphin2026-stl) — 原始 Windows 版作者
-- 无障碍执行层基于 [openclaw](https://github.com/openclaw/openclaw)（MIT License）
 
 ## 许可
 

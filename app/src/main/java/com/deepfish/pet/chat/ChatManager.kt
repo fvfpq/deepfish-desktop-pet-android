@@ -22,17 +22,6 @@ class ChatManager(private val settings: PetSettings, private val apiKey: String)
 
     suspend fun send(messages: List<ChatMessage>): String = sendInternal(messages, systemPrompt, 400)
 
-    /** 以自定义系统提示调用模型，用于非闲聊任务（如手机操作决策）。 */
-    suspend fun sendWithPrompt(
-        systemPrompt: String,
-        userMessage: String,
-        maxTokens: Int = 600,
-    ): String = sendInternal(
-        listOf(ChatMessage("user", userMessage)),
-        systemPrompt,
-        maxTokens,
-    )
-
     private suspend fun sendInternal(
         messages: List<ChatMessage>,
         system: String,
